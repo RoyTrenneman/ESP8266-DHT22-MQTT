@@ -14,11 +14,10 @@
 
 [2] ADC Pin: ESP8266EX also integrates a generic purpose 10-bit analog ADC. The ADC range is from 0V to 1.0V. It is typically used to measure the voltages from the sensor or battery status. The ADC cannot be used when the chip is transmitting. Otherwise the voltage may be inaccurate. (From Expressif datasheet CH 8.5)
 
-### ESP8266-12E
 
-Framework used: Arduino
+**Framework used: Arduino**
 
-IDE used:
+**IDE used**:
 [PlatformIO Core](http://platformio.org/get-started/cli)
 
 For the first upload you need upload the code through the serial port:
@@ -33,3 +32,4 @@ platformio run
 Then go to upgrade page and select .pioenvs/nodemcuv2/firmware.bin file.
 
 ![Alt text](./webpage.jpg)
+![Alt text](./wiring_ESP.jpg)
