@@ -2,8 +2,8 @@
 
 **2 modes:**
 
-1. Normal mode : The module send every X secondes[1], temperature, humidity and voltage battery[2] through MQTT
-2. Configuration mode (By pulling down GPIO13): A web page which allows:
+1.  Normal mode : The module send every X secondes[1], temperature, humidity and voltage battery[2] through MQTT
+2.  Configuration mode (By pulling down GPIO13): A web page which allows:
               *  configure MQTT IP brocker
 	      *  Set the frequency of sending information from DHT22 sensor in secondes  
 	      *  Configure the WIFI
