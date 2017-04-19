@@ -4,11 +4,11 @@
 
 1.  Normal mode : The module send every X secondes[1], temperature, humidity and voltage battery[2] through MQTT
 2.  Configuration mode (By pulling down GPIO13): A web page which allows:
-              *  configure MQTT IP brocker
-	      *  Set the frequency of sending information from DHT22 sensor in secondes  
-	      *  Configure the WIFI
-	      *  OTA upgrade  
-              *  Get Info about ESP
+              * configure MQTT IP brocker
+	      * Set the frequency of sending information from DHT22 sensor in secondes  
+	      * Configure the WIFI
+	      * OTA upgrade  
+              * Get Info about ESP
 
 [1] sleep mode: After you tell the ESP8266 to sleep, it’ll wait a specified number of microseconds, then trigger the XPD(GPIO16) pin to toggle the reset line(RST). When the ESP8266 wakes up, it’ll begin back at the start of the sketch.
 
