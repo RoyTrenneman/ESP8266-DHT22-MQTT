@@ -33,3 +33,4 @@ Then go to upgrade page and select .pioenvs/nodemcuv2/firmware.bin file.
 
 ![Alt text](./webpage.jpg)
 ![Alt text](./wiring_ESP.jpg)
+![Alt text](./module.jpg)
