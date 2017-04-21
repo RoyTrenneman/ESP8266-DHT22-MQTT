@@ -4,7 +4,7 @@
 
 1.  **Normal mode** : The module send every X secondes[1], temperature, humidity and voltage battery[2] through MQTT.
 2.  **Configuration mode** :By pulling down GPIO13, the module starts in Wifi acces point mode (reachable @ 192.168.4.1) and provide a web page which allows:
-  * configure MQTT IP brocker
+  * configure MQTT IP brocker and topics.
   * Set the frequency of sending information from DHT22 sensor in secondes  
   * Configure the WIFI
   * OTA upgrade  
@@ -25,7 +25,8 @@ For the first upload you need upload the code through the serial port:
 ```bash
 sudo platformio run --target upload
 ```
-Build and upgrade command:
+For future upgrade, simply use the OTA upgrade.
+Build the project:
 ``` bash
 platformio run 
 ```
