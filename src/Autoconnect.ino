@@ -113,9 +113,8 @@ void setup() {
  Serial.begin(115200);
  pinMode(13, INPUT_PULLUP); // Gpio13 to put the ESP back to AP 
  //fetches ssid and pass from eeprom and tries to connect
- //if it does not connect it starts an access point with the specified name
- //here  "AutoConnectAP"
- //and goes into a blocking loop awaiting configuration:
+ if (Portal.autoConnect()) {  //auto generated name ESP + ChipID
+ //and goes into a blocking loop awaiting configuration...
  //Now quitting the loog and entry in FS: 
  //Begining read configuration from FS /////////////////////////
   Serial.println("mounting FS...");
@@ -186,7 +185,6 @@ void setup() {
   }
 //END FS//////////////////////////////////////////////////////
  
- if (Portal.autoConnect()) {  //auto generated name ESP + ChipID
  //Start a temp measure 
   if (Portal._hasSensor == "true") {
   Serial.println("Has sensor!");
@@ -244,8 +242,8 @@ void setup() {
   Serial.printf("Warning, over-discharging detected; going to deepsleep forever");
   ESP.deepSleep(0) ; 
   }
- Serial.printf("Wifi_STA failed, unable to connect your AP, I'm going to sleep, bye bye, see you in %d secondes\n ", Portal.RefreshTime) ;
- ESP.deepSleep(Portal.RefreshTime * 1000000);
+ Serial.printf("Wifi_STA failed, let's retry in 10 min, going to deepsleep") ;
+ ESP.deepSleep(600 * 1000000);
  }
 
 }
