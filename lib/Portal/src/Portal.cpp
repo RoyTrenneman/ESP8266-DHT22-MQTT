@@ -1,4 +1,4 @@
-/**************************************************************
+    /**************************************************************
    Portal is a library for the ESP8266/Arduino platform
    (https://github.com/esp8266/Arduino) to enable easy
    configuration and reconfiguration of WiFi credentials using a Captive Portal
@@ -9,11 +9,12 @@
    Built by AlexT https://github.com/tzapu
    Licensed under MIT license
  **************************************************************/
-
+#include <FS.h>
 #include "Portal.h"
+
+
 ESP8266WebServer httpServer(8080);
 ESP8266HTTPUpdateServer httpUpdater;
-
 
 PortalParameter::PortalParameter(const char *custom) {
   _id = NULL;
@@ -38,6 +39,59 @@ void Portal::saveConfigCallback () {
   shouldSaveConfig = true;
 }
 
+void Portal::readconf() {
+ if (SPIFFS.begin()) {
+      if (SPIFFS.exists("/config")) {
+      //file exists, reading and loading
+      File configFile = SPIFFS.open("/config", "r");
+        if (configFile) {
+           // String next ;
+            while(configFile.available()) {
+            //Lets read line by line from the file
+                _mqttIP        = configFile.readStringUntil('\n');
+                _topic         = configFile.readStringUntil('\n');
+                _topic2        = configFile.readStringUntil('\n');
+                _GPIO          = configFile.readStringUntil('\n');
+                _RefreshTime   = configFile.readStringUntil('\n');
+                _hasSensor     = configFile.readStringUntil('\n');
+            }
+            //Remove newline and extraneouscharacters
+            _topic.trim();
+            _topic2.trim();
+            _mqttIP.trim();
+            _hasSensor.trim();
+            _GPIO.trim();
+            _RefreshTime .trim();
+       }
+      }
+ }
+ DEBUG_WM (_topic);
+ DEBUG_WM (_topic2);
+ DEBUG_WM (_mqttIP);
+ DEBUG_WM (_hasSensor);
+ DEBUG_WM (_GPIO);
+ DEBUG_WM (_RefreshTime);
+
+}
+void Portal::saveconf() {
+    //Save config
+     if (shouldSaveConfig) {
+       if (SPIFFS.begin())  {
+        Serial.println("saving config");
+        File configFile = SPIFFS.open("/config", "w");
+        if (!configFile) {
+          Serial.println("failed to open config file for writing");
+        }
+        configFile.println(_mqttIP);
+        configFile.println(_topic);
+        configFile.println(_topic2);
+        configFile.println(_GPIO);
+        configFile.println(_RefreshTime);
+        configFile.println(_hasSensor);
+        //end save
+       }
+      }
+}
 
 void PortalParameter::init(const char *id, const char *placeholder, const char *defaultValue, int length, const char *custom) {
   _id = id;
@@ -71,6 +125,8 @@ const char* PortalParameter::getCustomHTML() {
 }
 
 Portal::Portal() {
+
+
 }
 
 void Portal::addParameter(PortalParameter *p) {
@@ -160,15 +216,16 @@ boolean Portal::autoConnect(char const *apName, char const *apPassword) {
    DEBUG_WM(F("Force ESP back to AP")) ;
    return startConfigPortal(apName, apPassword);
   }
-  // attempt to connect; 
+  // attempt to connect;
   WiFi.mode(WIFI_STA);
   if (connectWifi("", "") == WL_CONNECTED)   {
     DEBUG_WM(F("IP Address:"));
     DEBUG_WM(WiFi.localIP());
     //connected
+    readconf();  /*read EEprom*/
     return true;
   } else {
-  return false ; //If Wifi_STA failed, do not return to AP 
+  return false ; //If Wifi_STA failed, do not return to AP
   //return startConfigPortal(apName, apPassword);
  }
 }
@@ -189,24 +246,31 @@ boolean  Portal::startConfigPortal(char const *apName, char const *apPassword) {
   connect = false;
   setupConfigPortal();
 
+  readconf();  /*read EEprom*/
+
   while (_configPortalTimeout == 0 || millis() < _configPortalStart + _configPortalTimeout) {
     //DNS
     dnsServer->processNextRequest();
     //HTTP
     server->handleClient();
     httpServer.handleClient();
-    
+
     if (connect) {
       connect = false;
       delay(2000);
-      DEBUG_WM(F("Connecting to new AP"));
 
+      //Trying to save conf:
+      saveconf(); /*save in EEprom*/
+      delay(2000);
+
+      DEBUG_WM(F("Connecting to new AP"));
+      WiFi.mode(WIFI_OFF);
+      WiFi.mode(WIFI_STA);
       // using user-provided  _ssid, _pass in place of system-stored ssid and pass
       if (connectWifi(_ssid, _pass) != WL_CONNECTED) {
         DEBUG_WM(F("Failed to connect."));
       } else {
         //connected
-        WiFi.mode(WIFI_STA);
         //notify that configuration has changed and any optional parameters should be saved
         if ( _savecallback != NULL) {
           //todo: check if any custom parameters actually exist, and check if they really changed maybe
@@ -399,16 +463,24 @@ void Portal::handleRoot() {
 }
 
 void Portal::handleMQTT() {
+  readconf();  /*read EEprom*/
+
   String page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Config ESP");
+
   page += FPSTR(HTTP_SCRIPT);
-  page += FPSTR(HTTP_STYLE); 
+  page += FPSTR(HTTP_STYLE);
   page += _customHeadElement;
   page += FPSTR(HTTP_HEAD_END);
- 
+
+
   page += FPSTR(HTTP_FORM_START_MQTT);
+  page.replace("{i}", _topic);
+  page.replace("{p}", _mqttIP);
+  page.replace("{q}", _topic2);
+  page.replace("{r}", _RefreshTime);
   char parLength[2];
- 
+
  page += FPSTR(HTTP_FORM_END);
  page += FPSTR(HTTP_END);
  server->send(200, "text/html", page);
@@ -605,7 +677,7 @@ void Portal::handleMQTTSave() {
  DEBUG_WM(mqtt_server);
  DEBUG_WM(mqtt_topic);
  DEBUG_WM(RefreshTime);
- 
+
 String page = FPSTR(HTTP_HEAD);
   page.replace("{v}", "Credentials Saved");
   page += FPSTR(HTTP_SCRIPT);
@@ -615,7 +687,7 @@ String page = FPSTR(HTTP_HEAD);
   page += FPSTR(HTTP_SAVED_MQTT);
   page += FPSTR(HTTP_END);
   server->send(200, "text/html", page);
- 
+
  saveConfigCallback ();
 }
 
@@ -624,7 +696,7 @@ void Portal::handleSENSORSave() {
 
  _hasSensor = server->arg("has_sensor").c_str();
  _GPIO = server->arg("r").c_str();
- 
+
  //convert String to int
  GPIO = atoi(_GPIO.c_str());
 

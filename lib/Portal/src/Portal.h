@@ -29,11 +29,11 @@ const char HTTP_HEAD[] PROGMEM            = "<!DOCTYPE html><html lang=\"en\"><h
 const char HTTP_STYLE[] PROGMEM           = "<style>.c{text-align: center;} div,input{padding:5px;font-size:1em;} input{width:95%;} body{text-align: center;font-family:verdana;} button{border:0;border-radius:0.3rem;background-color:#1fa3ec;color:#fff;line-height:2.4rem;font-size:1.2rem;width:100%;} .q{float: right;width: 64px;text-align: right;} .l{background: url(\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAALVBMVEX///8EBwfBwsLw8PAzNjaCg4NTVVUjJiZDRUUUFxdiZGSho6OSk5Pg4eFydHTCjaf3AAAAZElEQVQ4je2NSw7AIAhEBamKn97/uMXEGBvozkWb9C2Zx4xzWykBhFAeYp9gkLyZE0zIMno9n4g19hmdY39scwqVkOXaxph0ZCXQcqxSpgQpONa59wkRDOL93eAXvimwlbPbwwVAegLS1HGfZAAAAABJRU5ErkJggg==\") no-repeat left center;background-size: 1em;}</style>";
 const char HTTP_SCRIPT[] PROGMEM          = "<script>function c(l){document.getElementById('s').value=l.innerText||l.textContent;document.getElementById('p').focus();}</script>";
 const char HTTP_HEAD_END[] PROGMEM        = "</head><body><div style='text-align:left;display:inline-block;min-width:260px;'>";
-const char HTTP_HEAD_END_SENSOR[] PROGMEM        = "</head><body><div style='text-align:center;display:inline-block;min-width:260px;'>";
+const char HTTP_HEAD_END_SENSOR[] PROGMEM = "</head><body><div style='text-align:center;display:inline-block;min-width:260px;'>";
 const char HTTP_PORTAL_OPTIONS[] PROGMEM  = "<form action=\"/mqtt\" method=\"get\"><button>Configure MQTT</button></form><br/><form action=\"/sensor\" method=\"get\"><button>Configure Sensor</button></form><br/><form action=\"/wifi\" method=\"get\"><button>Configure WiFi</button></form><br/><form action=\"/0wifi\" method=\"get\"><button>Configure WiFi (No Scan)</button></form><br/><form action=\"/i\" method=\"get\"><button>Info</button></form><br/><form action=\"/upgrade\" method=\"get\"><button>upgrade</button></form><br/><form action=\"/r\" method=\"post\"><button>Save and Quit</button></form>";
 const char HTTP_ITEM[] PROGMEM            = "<div><a href='#p' onclick='c(this)'>{v}</a>&nbsp;<span class='q {i}'>{r}%</span></div>";
 const char HTTP_FORM_START[] PROGMEM      = "<form method='get' action='wifisave'><input id='s' name='s' length=32 placeholder='SSID'><br/><input id='p' name='p' length=64 type='password' placeholder='password'><br/>";
-const char HTTP_FORM_START_MQTT[] PROGMEM = "<form method='get' action='mqttsave'><input id='s' name='s' length=32 placeholder='BrokerIP'><br/><input id='p' name='p' length=64  placeholder='Topic ex: sensor/temp'><br/><input id='y' name='y' length=64  placeholder='Topic ex: sensor/humidity'><br/><input id='q' name='q' length=32 placeholder='RefreshTime: default 600s'><br/>";
+const char HTTP_FORM_START_MQTT[] PROGMEM = "<form method='get' action='mqttsave'><input id='s' name='s' length=32 placeholder={p}><br/><input id='p' name='p' length=64  placeholder={i} ><br/><input id='y' name='y' length=64  placeholder={q}><br/><input id='q' name='q' length=32 placeholder={r}><br/>";
 const char HTTP_FORM_START_SENSOR[] PROGMEM = "<form method='get' action='sensorsave'><input type=\"radio\" name=\"has_sensor\" value=\"true\">DHT22 \n<br><input type=\"radio\" name=\"has_sensor\" value=\"false\">No Sensor, just send GPIO state (HIGH or LOW)<br><br/><input id='r' name='r' length=32 placeholder='GPIO_Pin'><br/>";
 const char HTTP_FORM_PARAM[] PROGMEM      = "<br/><input id='{i}' name='{n}' length={l} placeholder='{p}' value='{v}' {c}>";
 const char HTTP_FORM_END[] PROGMEM        = "<br/><button type='submit'>save</button></form>";
@@ -81,11 +81,11 @@ class Portal
     char*         mqtt_topic2;
     int           RefreshTime;
     int           GPIO;
-    
+
     String	  _GPIO        = "" ;
-    String	  _RefreshTime = "" ;   
+    String	  _RefreshTime = "" ;
     String        _mqttIP      = "" ;
-    String        _topic       = "" ;
+    String        _topic      ; // = "" ;
     String        _topic2       = "" ;
     String	  _hasSensor   = "" ;
 
@@ -104,7 +104,9 @@ class Portal
     //in seconds setConfigPortalTimeout is a new name for setTimeout
     void          setConfigPortalTimeout(unsigned long seconds);
     void          setTimeout(unsigned long seconds);
-    //MQTT handle 
+    //MQTT handle
+    void          readconf();
+    void          saveconf();
     void          handleMQTTSave();
     void          handleMQTT();
     //Sensor handle
@@ -214,6 +216,8 @@ class Portal
       DEBUG_WM("NO fromString METHOD ON IPAddress, you need ESP8266 core 2.1.0 or newer for Custom IP configuration to work.");
       return false;
     }
+
+
 };
 
 #endif
