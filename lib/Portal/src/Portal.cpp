@@ -496,6 +496,7 @@ void Portal::handleSENSOR() {
   page += FPSTR(HTTP_HEAD_END_SENSOR);
 
   page += FPSTR(HTTP_FORM_START_SENSOR);
+  page.replace("{i}", _GPIO);
   char parLength[2];
 
  page += FPSTR(HTTP_FORM_END);

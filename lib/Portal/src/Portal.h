@@ -34,7 +34,7 @@ const char HTTP_PORTAL_OPTIONS[] PROGMEM  = "<form action=\"/mqtt\" method=\"get
 const char HTTP_ITEM[] PROGMEM            = "<div><a href='#p' onclick='c(this)'>{v}</a>&nbsp;<span class='q {i}'>{r}%</span></div>";
 const char HTTP_FORM_START[] PROGMEM      = "<form method='get' action='wifisave'><input id='s' name='s' length=32 placeholder='SSID'><br/><input id='p' name='p' length=64 type='password' placeholder='password'><br/>";
 const char HTTP_FORM_START_MQTT[] PROGMEM = "<form method='get' action='mqttsave'><input id='s' name='s' length=32 placeholder={p}><br/><input id='p' name='p' length=64  placeholder={i} ><br/><input id='y' name='y' length=64  placeholder={q}><br/><input id='q' name='q' length=32 placeholder={r}><br/>";
-const char HTTP_FORM_START_SENSOR[] PROGMEM = "<form method='get' action='sensorsave'><input type=\"radio\" name=\"has_sensor\" value=\"true\">DHT22 \n<br><input type=\"radio\" name=\"has_sensor\" value=\"false\">No Sensor, just send GPIO state (HIGH or LOW)<br><br/><input id='r' name='r' length=32 placeholder='GPIO_Pin'><br/>";
+const char HTTP_FORM_START_SENSOR[] PROGMEM = "<form method='get' action='sensorsave'><input type=\"radio\" name=\"has_sensor\" value=\"true\">DHT22 \n<br><input type=\"radio\" name=\"has_sensor\" value=\"false\">No Sensor, just send GPIO state (HIGH or LOW)<br><br/><input id='r' name='r' length=32 placeholder={i}><br/>";
 const char HTTP_FORM_PARAM[] PROGMEM      = "<br/><input id='{i}' name='{n}' length={l} placeholder='{p}' value='{v}' {c}>";
 const char HTTP_FORM_END[] PROGMEM        = "<br/><button type='submit'>save</button></form>";
 const char HTTP_SCAN_LINK[] PROGMEM       = "<br/><div class=\"c\"><a href=\"/wifi\">Scan</a></div>";
